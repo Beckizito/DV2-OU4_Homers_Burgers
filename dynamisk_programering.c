@@ -23,11 +23,14 @@ int main (int argc, char *argv[], FILE **test_cases)
 	}
 
 	char c;
-	int read_integers;
+	int read_integers = 0;
 	int m;
 	int n;
 	int t;
 
+	//ändra f. ett tecken till att läsa alla tecken till ' ' 
+	//hittas, så att m,n > 9 fungerar
+	//om fler än 3 tal finns i filen läses dessa 
 	while ((c = fgetc(test_cases) != EOF))
 	{
 		if (c != ' ')
