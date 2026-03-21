@@ -1,86 +1,103 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct burgers_and_beer{
 	int burgers; 
 	int beer;
 } burgers_and_beer;
 
-void compute_burgers_and_beer(int m, int n, int t);
-void initialize_bb(burgers_and_beer bb, int t);
+burgers_and_beer compute_burgers_and_beer(int m, int n, int t, burgers_and_beer *results);
+burgers_and_beer initialize_bb(int t);
+void clear_string(char *string, int len);
+void set_result(burgers_and_beer *results, burgers_and_beer option, int t);
 
-int main (int argc, char *argv[], FILE **test_cases)
+int main (int argc, const char *argv[])
 {
 	FILE *test_cases = fopen(argv[1], "r");
-
-	if (argc == 1)
+	if (test_cases == NULL)
 	{
-		if (*test_cases == NULL)
-		{
-			fprintf(stderr, "Could not open the file: %s\n", argv[1]);
-			return 1;
-		}
+		return 1;
 	}
-
+	
 	char c;
-	int read_integers = 0;
+	char s[6];
+	clear_string(s, 5);
+	int read_integers = 1;
 	int m;
 	int n;
 	int t;
 
-	//ändra f. ett tecken till att läsa alla tecken till ' ' 
-	//hittas, så att m,n > 9 fungerar
-	//om fler än 3 tal finns i filen läses dessa 
-	while ((c = fgetc(test_cases) != EOF))
+	do
 	{
-		if (c != ' ')
+		c = fgetc(test_cases);
+		if (c != ' ' && c != EOF && c != '\n')
 		{
-			read_integers ++;
+			s[strlen(s)] = c;
+		}
+		else
+		{
+			s[strlen(s)] = '\0';
 			if (read_integers == 3)
 			{
-				t = atoi(&c);
-				results = calloc(t, sizeof(burgers_and_beer));
-				for (int i = 0; i < t; i++)
+				t = atoi(s);
+				burgers_and_beer results[t+1];
+				int i = 0;
+				while (i <= t)
 				{
-					results[i] = compute_burgers_and_beer(m, n, t);
+					results[i] = compute_burgers_and_beer(m, n, i, results);
+					i++;
 				}
-				printf("%d %d", results[t-1].burger, results[t-1].beer);
-				free(results);
-				read_integers = 0;
+				printf("%d ", results[t].burgers);
+				if (results[t].beer != 0)
+				{
+					printf("%d", results[t].beer);
+				}
+				printf("\n");
+				read_integers = 1;
+				clear_string(s, strlen(s));
 			}
 			else if (read_integers == 1)
 			{
-				m = atoi(&c);
+				m = atoi(s);
+				read_integers ++;
+				clear_string(s, strlen(s));
 			}
 			else if (read_integers == 2)
 			{
-				n = atoi(&c);
+				n = atoi(s);
+				read_integers ++;
+				clear_string(s, strlen(s));
 			}
 		}
-	}
+	} while (c != EOF);
+	fclose(test_cases);
+	return 0;
 }
 
-void compute_burgers_and_beer(int m, int n, int t)
+burgers_and_beer compute_burgers_and_beer(int m, int n, int t, burgers_and_beer *results)
 {
-	burgers_and_beer option_m;
-	burgers_and_beer option_n;
-	initialize_bb(option_m, t);
-	initialize_bb(option_n, t);
+	burgers_and_beer option_m = initialize_bb(t);
+	burgers_and_beer option_n = option_m;
 
+	if (t == 0)
+	{
+		return option_m;
+	}
 	if (t - m >= 0)
 	{
-		if (results[t-m] >= 0)
+		if (results[t-m].beer >= 0)
 		{
-			option_m = results[t-m]
+			option_m = results[t-m];
 		}
 		option_m.burgers ++;
 	}
 
 	if (t - n >= 0)
 	{
-		if (results[t-n] >= 0)
+		if (results[t-n].beer >= 0)
 		{
-			option_n = results[t-n]
+			option_n = results[t-n];
 		}
 		option_n.burgers ++;
 	}
@@ -91,26 +108,55 @@ void compute_burgers_and_beer(int m, int n, int t)
 		{
 			if (option_m.burgers > option_n.burgers)
 			{
-				results[t] = option_m;
+				return option_m;
 			}
 			else
 			{
-				results[t] = option_n;
+				return option_n;
 			}
 		}
 		else if (option_m.beer < option_n.beer)
 		{
-			results[t] = option_m;
+			return option_m;
 		}
 		else
 		{
-			results[t] = option_n;
+			return option_n;
+		}
+	}
+	else
+	{
+		if (option_m.beer < option_n.beer)
+		{
+			return option_m;
+		}
+		else
+		{
+			return option_n;
 		}
 	}
 }
 
-void initialize_bb(burgers_and_beer bb, int t);
+burgers_and_beer initialize_bb(int t)
 {
+	burgers_and_beer bb;
 	bb.burgers = 0;
 	bb.beer = t;
+	return bb;
+}
+
+void clear_string(char *string, int len)
+{
+	int i = 0;
+	while (i <= len)
+	{
+		string[i] = '\0';
+		i++;
+	}
+}
+
+void set_result(burgers_and_beer *results, burgers_and_beer option, int t)
+{
+	results[t].burgers = option.burgers;
+	results[t].beer = option.beer;
 }

@@ -9,16 +9,21 @@ typedef struct burgers_and_beer{
 
 burgers_and_beer compute_burgers_and_beer(int m, int n, int t);
 burgers_and_beer initialize_bb(int t);
-void clear_string(char *string);
+void clear_string(char *string, int len);
 
 int main (int argc, const char *argv[])
 {
 	FILE *test_cases = fopen(argv[1], "r");
+	if (test_cases == NULL)
+	{
+		return 1;
+	}
 
 	burgers_and_beer result;
 	
 	char c;
 	char s[6];
+	clear_string(s, 5);
 	int read_integers = 1;
 	int m;
 	int n;
@@ -26,7 +31,7 @@ int main (int argc, const char *argv[])
 	do
 	{
 		c = fgetc(test_cases);
-		if (c != ' ' && c != EOF)
+		if (c != ' ' && c != EOF && c != '\n')
 		{
 			s[strlen(s)] = c;
 		}
@@ -37,24 +42,31 @@ int main (int argc, const char *argv[])
 			{
 				t = atoi(s);
 				result = compute_burgers_and_beer(m, n, t);
-				printf("%d %d ", result.burgers, result.beer);
+				printf("%d ", result.burgers);
+				if (result.beer != 0)
+				{
+					printf("%d", result.beer);
+				}
+				printf("\n");
 				read_integers = 1;
-				clear_string(s);
+				clear_string(s, strlen(s));
 			}
 			else if (read_integers == 1)
 			{
 				m = atoi(s);
 				read_integers ++;
-				clear_string(s);
+				clear_string(s, strlen(s));
 			}
 			else if (read_integers == 2)
 			{
 				n = atoi(s);
 				read_integers ++;
-				clear_string(s);
+				clear_string(s, strlen(s));
 			}
 		}
 	} while (c != EOF);
+	fclose(test_cases);
+	return 0;
 }
 
 burgers_and_beer compute_burgers_and_beer(int m, int n, int t)
@@ -104,7 +116,14 @@ burgers_and_beer compute_burgers_and_beer(int m, int n, int t)
 	}
 	else
 	{
-
+		if (option_m.beer > option_n.beer)
+		{
+			return option_m;
+		}
+		else
+		{
+			return option_m;
+		}
 	}
 }
 
@@ -116,10 +135,9 @@ burgers_and_beer initialize_bb(int t)
 	return bb;
 }
 
-void clear_string(char *string)
+void clear_string(char *string, int len)
 {
-	int l = strlen(string);
-	for (int i = 0; i <= l; i++)
+	for (int i = 0; i <= len; i++)
 	{
 		string[i] = '\0';
 	}
