@@ -1,140 +1,101 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 typedef struct burgers_and_beer{
 	int burgers; 
 	int beer;
 } burgers_and_beer;
 
-burgers_and_beer compute_burgers_and_beer(int m, int n, int t, burgers_and_beer *results);
+burgers_and_beer compute_burgers_and_beer(int m, int n, int t);
 burgers_and_beer initialize_bb(int t);
-void clear_string(char *string, int len);
-void set_result(burgers_and_beer *results, burgers_and_beer option, int t);
+void put_result_in_array(burgers_and_beer *results, burgers_and_beer option, int t);
 
 int main (int argc, const char *argv[])
 {
-	FILE *test_cases = fopen(argv[1], "r");
-	if (test_cases == NULL)
-	{
-		return 1;
-	}
 	
-	char c;
-	char s[6];
-	clear_string(s, 5);
-	int read_integers = 1;
+	burgers_and_beer result;
 	int m;
-	int n;
-	int t;
+	int n ;
+	int t ;
 
-	do
-	{
-		c = fgetc(test_cases);
-		if (c != ' ' && c != EOF && c != '\n')
+	while (scanf("%d %d %d", &m, &n, &t) != EOF)
+	{	
+		result = compute_burgers_and_beer(m, n, t);
+		printf("%d", result.burgers);
+		if (result.beer != 0)
 		{
-			s[strlen(s)] = c;
+			printf(" %d", result.beer);
 		}
-		else
-		{
-			s[strlen(s)] = '\0';
-			if (read_integers == 3)
-			{
-				t = atoi(s);
-				burgers_and_beer results[t+1];
-				int i = 0;
-				while (i <= t)
-				{
-					results[i] = compute_burgers_and_beer(m, n, i, results);
-					i++;
-				}
-				printf("%d ", results[t].burgers);
-				if (results[t].beer != 0)
-				{
-					printf("%d", results[t].beer);
-				}
-				printf("\n");
-				read_integers = 1;
-				clear_string(s, strlen(s));
-			}
-			else if (read_integers == 1)
-			{
-				m = atoi(s);
-				read_integers ++;
-				clear_string(s, strlen(s));
-			}
-			else if (read_integers == 2)
-			{
-				n = atoi(s);
-				read_integers ++;
-				clear_string(s, strlen(s));
-			}
-		}
-	} while (c != EOF);
-	fclose(test_cases);
+		printf("\n");
+	}
 	return 0;
 }
 
-burgers_and_beer compute_burgers_and_beer(int m, int n, int t, burgers_and_beer *results)
+burgers_and_beer compute_burgers_and_beer(int m, int n, int t)
 {
-	burgers_and_beer option_m = initialize_bb(t);
-	burgers_and_beer option_n = option_m;
-
-	if (t == 0)
+	burgers_and_beer results[t+1];
+	int i = 0;
+	while (i <= t)
 	{
-		return option_m;
+		results[i] = initialize_bb(-1);
+		i++;
 	}
-	if (t - m >= 0)
+	i = 0;
+	while (i <= t)
 	{
-		if (results[t-m].beer >= 0)
+		burgers_and_beer option_m = initialize_bb(i);
+		burgers_and_beer option_n = option_m;
+
+		if (i == 0)
 		{
-			option_m = results[t-m];
+			put_result_in_array(results, option_m, i);
 		}
-		option_m.burgers ++;
-	}
-
-	if (t - n >= 0)
-	{
-		if (results[t-n].beer >= 0)
+		if (i - m >= 0)
 		{
-			option_n = results[t-n];
-		}
-		option_n.burgers ++;
-	}
-
-	if (option_m.burgers != 0 && option_n.burgers != 0)
-	{
-		if (option_m.beer == option_n.beer)
-		{
-			if (option_m.burgers > option_n.burgers)
+			if (results[i-m].beer != -1)
 			{
-				return option_m;
+				option_m = results[i-m];
+				option_m.burgers ++;
+			}
+		}
+
+		if (i - n >= 0)
+		{
+			if (results[i-n].beer != -1)
+			{
+				option_n = results[i-n];
+				option_n.burgers ++;
+			}
+		}
+
+		if (option_n.beer != option_m.beer)
+		{
+			if (option_n.beer < option_m.beer)
+			{
+				put_result_in_array(results, option_n, i);
 			}
 			else
 			{
-				return option_n;
+				put_result_in_array(results, option_m, i);
 			}
 		}
-		else if (option_m.beer < option_n.beer)
-		{
-			return option_m;
-		}
 		else
 		{
-			return option_n;
+			if (option_n.burgers < option_m.burgers)
+			{
+				put_result_in_array(results, option_m, i);
+			}
+			else
+			{
+				put_result_in_array(results, option_n, i);
+			}
 		}
+		i++;
 	}
-	else
-	{
-		if (option_m.beer < option_n.beer)
-		{
-			return option_m;
-		}
-		else
-		{
-			return option_n;
-		}
-	}
+	i = 0;
+	return results[t];
 }
 
 burgers_and_beer initialize_bb(int t)
@@ -143,16 +104,6 @@ burgers_and_beer initialize_bb(int t)
 	bb.burgers = 0;
 	bb.beer = t;
 	return bb;
-}
-
-void clear_string(char *string, int len)
-{
-	int i = 0;
-	while (i <= len)
-	{
-		string[i] = '\0';
-		i++;
-	}
 }
 
 void set_result(burgers_and_beer *results, burgers_and_beer option, int t)
