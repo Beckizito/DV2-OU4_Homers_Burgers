@@ -54,20 +54,14 @@ burgers_and_beer compute_burgers_and_beer(int m, int n, int t)
 		}
 		if (i - m >= 0)
 		{
-			if (results[i-m].beer != -1)
-			{
-				option_m = results[i-m];
-				option_m.burgers ++;
-			}
+			option_m = results[i-m];
+			option_m.burgers ++;
 		}
 
 		if (i - n >= 0)
 		{
-			if (results[i-n].beer != -1)
-			{
-				option_n = results[i-n];
-				option_n.burgers ++;
-			}
+			option_n = results[i-n];
+			option_n.burgers ++;
 		}
 
 		if (option_n.beer != option_m.beer)
