@@ -131,7 +131,7 @@ burgers_and_beer initialize_bb(int t)
  * Input: The result array in which the option is to be set as result, the option and the index
  * Output: An array in which the result has been set at index t
  */
-void set_result(burgers_and_beer *results, burgers_and_beer option, int t)
+void put_result_in_array(burgers_and_beer *results, burgers_and_beer option, int t)
 {
 	results[t].burgers = option.burgers;
 	results[t].beer = option.beer;
